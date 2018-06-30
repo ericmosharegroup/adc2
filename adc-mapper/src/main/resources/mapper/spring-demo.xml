@@ -11,9 +11,9 @@
 
     <bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
           init-method="init" destroy-method="close">
-        <property name="url" value="jdbc:mysql://${ADC_DS_HOST}/${ADC_DS_DB}?characterEncode=UTF-8"/>
-        <property name="username" value="${ADC_DS_USERNAME}"/>
-        <property name="password" value="${ADC_DS_PASSWORD}"/>
+        <property name="url" value="${spring.datasource.url}"/>
+        <property name="username" value="${spring.datasource.username}"/>
+        <property name="password" value="${spring.datasource.password}"/>
         <property name="initialSize" value="${spring.datasource.initial-size}"/>
         <property name="maxActive" value="${spring.datasource.max-active}"/>
         <property name="minIdle" value="${spring.datasource.min-idle}"/>
