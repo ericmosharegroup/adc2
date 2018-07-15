@@ -13,6 +13,8 @@ public enum MessageCode {
     systemError("SYSTEM_ERROR", "ststem error"),
     connectionError("CONNECTION_ERROR", "connection error"),
     userError("USER_ERROR", "user error"),
+    userNotExist("USER_NO_EXIST", "user not exist"),
+    passwdError("PASSWD_ERROR", "passwd is wrong"),
     duplicateUser("DUPLICATE_USER", "duplicate user");
 
     private final String code;

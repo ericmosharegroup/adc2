@@ -29,7 +29,7 @@ public class AdcException extends Exception {
     }
 
     public AdcException(MessageCode messageCode) {
-        super();
+        super(messageCode.getMessage());
         this.messageCode = messageCode;
     }
 

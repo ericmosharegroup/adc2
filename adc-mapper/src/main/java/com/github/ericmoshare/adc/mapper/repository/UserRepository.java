@@ -13,6 +13,8 @@ public interface UserRepository {
 
     int deleteByExample(UserExample example);
 
+    int deleteByPrimaryKey(Long id);
+
     int insert(User record);
 
     int insertSelective(User record);

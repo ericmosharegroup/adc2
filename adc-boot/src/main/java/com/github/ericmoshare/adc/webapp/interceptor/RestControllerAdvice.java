@@ -58,7 +58,7 @@ public class RestControllerAdvice implements ResponseBodyAdvice<Object> {
 
         } else if (throwable instanceof AdcException) {
             AdcException e = (AdcException) throwable;
-            LOGGER.error("catch AdcException {}", e.getMessage(), e);
+            LOGGER.error("catch AdcException {}", e.getMessage());
 
             return new ResponseEntity<Resp>(new Resp(e.getMessage(), e.getResponse()), HttpStatus.OK);
 
