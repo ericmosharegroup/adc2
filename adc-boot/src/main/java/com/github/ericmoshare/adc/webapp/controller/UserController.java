@@ -6,6 +6,7 @@ import com.github.ericmoshare.adc.exception.AdcException;
 import com.github.ericmoshare.adc.mapper.entity.User;
 import com.github.ericmoshare.adc.service.UserService;
 import com.github.ericmoshare.adc.webapp.vo.Resp;
+import com.github.ericmoshare.adc.webapp.vo.UserLoginVO;
 import com.github.ericmoshare.adc.webapp.vo.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,16 @@ public class UserController {
         BeanUtils.copyProperties(request, user);
 
         Object response = userService.create(user);
+        LOGGER.info("[create]响应结果 = {}", response);
+        return new ResponseEntity<Resp>(new Resp(MessageCode.success, response), HttpStatus.OK);
+
+    }
+
+    @RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<Resp> login(@RequestBody @Valid UserLoginVO request) throws AdcException {
+        LOGGER.info("[create]接受请求 = {}", JSON.toJSONString(request));
+
+        Object response = userService.login(request.getUserNo(), request.getPasswd());
         LOGGER.info("[create]响应结果 = {}", response);
         return new ResponseEntity<Resp>(new Resp(MessageCode.success, response), HttpStatus.OK);
 

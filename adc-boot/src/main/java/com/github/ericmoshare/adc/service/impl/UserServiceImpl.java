@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-
-import static com.github.ericmoshare.adc.enums.MessageCode.userNotExist;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author eric.mo
@@ -24,7 +24,8 @@ import static com.github.ericmoshare.adc.enums.MessageCode.userNotExist;
 @Service
 public class UserServiceImpl implements com.github.ericmoshare.adc.service.UserService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Map<String, User> LOGIN_USERS = new ConcurrentHashMap<>();
 
     @Autowired
     private UserRepository userRepository;
@@ -36,7 +37,7 @@ public class UserServiceImpl implements com.github.ericmoshare.adc.service.UserS
         try {
             return userRepository.insertSelective(user);
         } catch (DuplicateKeyException e) {
-            LOGGER.error("用户已存在,无需注册. user = {}", JSON.toJSONString(user));
+            log.error("用户已存在,无需注册. user = {}", JSON.toJSONString(user));
             throw new AdcException(MessageCode.duplicateUser, "用户已存在,无需注册");
         }
     }
@@ -60,6 +61,9 @@ public class UserServiceImpl implements com.github.ericmoshare.adc.service.UserS
             throw new AdcException(MessageCode.passwdError);
         }
 
+        log.info("userNo={} login success", user.getUserNo());
+        LOGIN_USERS.put(user.getUserNo(), user);
+
         //密码正确
         return true;
     }
@@ -77,6 +81,5 @@ public class UserServiceImpl implements com.github.ericmoshare.adc.service.UserS
 
         return 0;
     }
-
 
 }
