@@ -11,7 +11,7 @@ public interface UserService {
 
     int create(User user) throws IllegalArgumentException, AdcException;
 
-    boolean login(String userNo, String passwd) throws AdcException;
+    User login(String userNo, String passwd) throws AdcException;
 
     int delete(Long Id) throws AdcException;
 }

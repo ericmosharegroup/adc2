@@ -43,7 +43,7 @@ public class UserServiceImpl implements com.github.ericmoshare.adc.service.UserS
     }
 
     @Override
-    public boolean login(String userNo, String passwd) throws AdcException {
+    public User login(String userNo, String passwd) throws AdcException {
         UserExample example = new UserExample();
         example.createCriteria().andUserNoEqualTo(userNo);
 
@@ -64,8 +64,12 @@ public class UserServiceImpl implements com.github.ericmoshare.adc.service.UserS
         log.info("userNo={} login success", user.getUserNo());
         LOGIN_USERS.put(user.getUserNo(), user);
 
+        User result = new User();
+        result.setUsername(user.getUsername());
+        result.setUserNo(userNo);
+        result.setUserId(user.getUserId());
         //密码正确
-        return true;
+        return result;
     }
 
     @Override

@@ -33,7 +33,7 @@ public class UserServiceTest extends BaseNGTest {
         user.setUserNo("52@qq.com");
         user.setPasswd("12345678");
 
-        boolean result = userService.login(user.getUserNo(), user.getPasswd());
+        Object result = userService.login(user.getUserNo(), user.getPasswd());
         System.out.println(">>>>" + result);
     }
 

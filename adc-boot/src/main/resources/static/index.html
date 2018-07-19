@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Bootstrap 实例 - 一个简单的网页</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/angular.js/1.4.6/angular.min.js"></script>
+    <script src="https://cdn.bootcss.com/angular.js/1.4.6/angular-cookies.min.js"></script>
+
+    <style>
+        .fakeimg {
+            height: 200px;
+            background: #aaa;
+        }
+    </style>
+</head>
+<body>
+<div id="myTabContent" class="tab-content" ng-app="myApp" ng-controller="myCtrl">
+    <ul id="myTab" class="nav nav-tabs" style="margin-top: 30px;">
+        <li class="active">
+            <a href="#home" data-toggle="tab">Home</a>
+        </li>
+        <li><a href="#login" data-toggle="tab"><em class="glyphicon glyphicon-send"></em>&nbsp;Login</a></li>
+        <li><a href="#" data-toggle="tab"><em class="glyphicon glyphicon-user"></em>&nbsp;{{loginUser}}{{loginMessage}}</a></li>
+    </ul>
+
+
+    <div class="tab-pane fade in active" id="home">
+        <div class="container-fluid info-table">
+            home
+        </div>
+    </div>
+
+
+    <div class="tab-pane fade" id="login">
+        <div class="container-fluid info-table">
+            <div class="container">
+                <div class="row clearfix">
+                    <div class="col-md-6 column col-md-offset-3">
+                        <form class="form-horizontal" role="form" style="margin-top: 30px;">
+                            <div class="form-group">
+                                <label for="userNo" class="col-sm-2 control-label">UserNo</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="userNo" ng-model="loginData.userNo"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="passwd" class="col-sm-2 control-label">Password</label>
+                                <div class="col-sm-10">
+                                    <input type="password" class="form-control" id="passwd" ng-model="loginData.passwd"/>{{ loginData.passwd}}
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <button type="submit" class="btn btn-default" ng-click="login()">Log in</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="myErrorAlert" class="alert alert-danger alert-dismissable" ng-show="showError">
+        <button type="button" class="close" data-dismiss="alert"
+                aria-hidden="true">
+            &times;
+        </button>
+        {{loginData.userNo}} {{errorMessage}}
+    </div>
+
+    <div id="mySuccessAlert" class="alert alert-success" ng-show="showSuccess">
+        <button type="button" class="close" data-dismiss="alert"
+                aria-hidden="true">
+            &times;
+        </button>
+        <strong>成功！</strong>结果是成功的。
+        {{loginData.userNo}} {{successMessage}}
+    </div>
+
+    <br>
+
+</div>
+
+<div class="jumbotron text-center" style="margin-bottom:0">
+    <p>底部内容</p>
+</div>
+
+
+<script>
+    var app = angular.module('myApp', ['ngCookies']);
+    var serverUrl = "http://localhost:8090";
+
+    app.controller('myCtrl', function ($scope, $http, $cookieStore) {
+        $scope.userNo = "";
+        $scope.passwd = "";
+
+        /**
+         * 初始化请求参数
+         */
+        $scope.loginData = {
+            userNo: '1531878038131',
+            passwd: '12345678'
+        }
+
+        $scope.showError = false;
+        $scope.showSuccess = false;
+        $scope.loginUser = "";
+        $scope.loginMessage = "";
+
+        console.log("cookies user:" + $cookieStore.get("user"));
+
+        if ($cookieStore.get("user") != null) {
+            var user = JSON.parse($cookieStore.get("user"));
+
+            $scope.loginUser = user.username;
+            $scope.loginMessage = "";
+        }
+
+        $scope.login = function () {
+            console.log("login:" + JSON.stringify($scope.loginData));
+
+            var queryParameter = {};
+            var targetUrl = serverUrl + "/user/login";
+
+            $.deepCopy(queryParameter, $scope.loginData);
+
+            $scope.postAjaxJson(targetUrl, queryParameter, $http, function (data) {
+                console.info("response:" + JSON.stringify(data));
+                console.info("respCode:" + data.respCode + ", respMsg:" + data.respMsg);
+
+                if (data.respCode == "SUCCESS" || data.respMsg == "success") {
+                    console.info("登录成功:" + $scope.loginData.userNo);
+
+                    $scope.showSuccess = true;
+                    $scope.successMessage = "登录成功";
+
+                    $scope.loginUser = data.data.username;
+                    $scope.loginMessage = "";
+
+                    $cookieStore.put("user", JSON.stringify(data.data));
+
+                    console.log("cookies:" + $cookieStore.get("user"));
+
+                } else {
+                    console.info("登录失败:" + $scope.loginData.userNo);
+                    $scope.showError = true;
+                    $scope.errorMessage = data.respMsg;
+
+                    $("#myErrorAlert").alert();
+                }
+
+            });
+        }
+
+        $scope.postAjaxJson = function (url, data, $http, callback, fail, $scope) {
+            console.log("login data:" + JSON.stringify(data));
+
+            var req = {
+                method: 'POST',//请求的方式
+                url: '/user/login',//请求的地址
+                headers: {
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Accept': '*/*',
+                    'Access-Control-Allow-Origin': '*'
+                },//请求的头，如果默认可以不写
+                timeout: 5000,//超时时间，还没有测试
+                data: data
+            };
+
+            $http(req).success(function (data, status, headers, config) {
+                //成功后的数据处理
+                console.info("call success:" + JSON.stringify(data));
+                callback(data);
+            }).error(function (data, status, headers, config) {
+                //失败后的提示
+                console.log("error", data, status, headers, JSON.stringify(config));
+                $scope.showError = true;
+                $scope.errorMessage = data.respMsg
+            });
+        };
+
+
+    });
+
+
+    $.getType = function (o) {
+        var _t;
+        return ((_t = typeof(o)) == "object" ? o == null && "null" || Object.prototype.toString.call(o).slice(8, -1) : _t).toLowerCase();
+    }
+
+    $.deepCopy = function (destination, source) {
+        for (var p in source) {
+            if ($.getType(source[p]) == "array" || $.getType(source[p]) == "object") {
+                destination[p] = $.getType(source[p]) == "array" ? [] : {};
+                arguments.callee(destination[p], source[p]);
+            } else {
+                destination[p] = source[p];
+            }
+        }
+        return destination;
+    }
+</script>
+
+
+</body>
+</html>
